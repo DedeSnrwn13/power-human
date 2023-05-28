@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\API\CompanyController;
 use App\Http\Controllers\API\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,12 +15,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/company', [CompanyController::class, 'all']);
+// Company API
+Route::prefix('company')->name('company.')->middleware('auth:sanctum')->group(function() {
+    Route::get('', [CompanyController::class, 'fetch'])->name('fetch');
+    Route::post('', [CompanyController::class, 'create'])->name('create');
+    Route::post('update/{id}', [CompanyController::class, 'update'])->name('update');
+});
 
-Route::post('login', [UserController::class, 'login']);
-Route::post('register', [UserController::class, 'register']);
+// Auth API
+Route::name('auth.')->group(function () {
+    Route::post('login', [UserController::class, 'login'])->name('login');
+    Route::post('register', [UserController::class, 'register'])->name('register');
 
-Route::middleware('auth:sanctum')->group(function() {
-    Route::post('logout', [UserController::class, 'logout']);
-    Route::get('user', [UserController::class, 'fetch']);
+    Route::middleware('auth:sanctum')->group(function() {
+        Route::post('logout', [UserController::class, 'logout'])->name('logout');
+        Route::get('user', [UserController::class, 'fetch'])->name('fetch');
+    });
 });
