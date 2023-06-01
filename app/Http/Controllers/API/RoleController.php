@@ -17,12 +17,13 @@ class RoleController extends Controller
         $id = $request->input('id');
         $name = $request->input('name');
         $limit = $request->input('limit', 10);
+        $with_responsibilities = $request->input('with_responsibilities', false);
 
         $roleQuery = Role::query();
 
         // Get single data
         if ($id) {
-            $role = $roleQuery->find($id);
+            $role = $roleQuery->with('responsibilities')->find($id);
 
             if ($role) {
                 return ResponseFormatter::success($role, 'Role found');
@@ -36,6 +37,10 @@ class RoleController extends Controller
 
         if ($name) {
             $roles->where('name', 'like', '%' . $name . '%');
+        }
+
+        if ($with_responsibilities) {
+            $roles->with('responsibilities');
         }
 
         return ResponseFormatter::success(
@@ -58,29 +63,6 @@ class RoleController extends Controller
             }
 
             return ResponseFormatter::success($role, 'Role created');
-        } catch (Exception $e) {
-            return ResponseFormatter::error($e->getMessage());
-        }
-    }
-
-    public function update(UpdateRoleRequest $request, $id)
-    {
-        try {
-            // Get role
-            $role = role::find($id);
-
-            // Check if role exists
-            if (!$role) {
-                throw new Exception('Role not found');
-            }
-
-            // Update role
-            $role->update([
-                'name' => $request->name,
-                'company_id' => $request->company_id
-            ]);
-
-            return ResponseFormatter::success($role, 'Role updated');
         } catch (Exception $e) {
             return ResponseFormatter::error($e->getMessage());
         }
