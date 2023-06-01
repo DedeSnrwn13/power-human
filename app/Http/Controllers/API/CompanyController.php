@@ -73,7 +73,7 @@ class CompanyController extends Controller
             // Load users at company
             $company->load('users');
 
-            return ResponseFormatter::success($company, 'Comapany created');
+            return ResponseFormatter::success($company, 'Company created');
         } catch (Exception $e) {
             return ResponseFormatter::error($e->getMessage());
         }
@@ -98,7 +98,7 @@ class CompanyController extends Controller
             // Update company
             $company->update([
                 'name' => $request->name,
-                'logo' => $path
+                'logo' => isset($path) ? $path : $company->logo
             ]);
 
             return ResponseFormatter::success($company, 'Company updated');
